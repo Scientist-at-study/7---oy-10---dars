@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <h2>Comment by {{ comment.author.username }}</h2>
+    <p class="text-muted">{{ comment.created_at|date:"d M Y H:i" }}</p>
+    <p>{{ comment.comment }}</p>
+
+    {% if user == comment.user %}
+        <a href="{% url 'comment_edit' comment.pk %}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="{% url 'comment_delete' comment.pk %}" class="btn btn-danger btn-sm">Delete</a>
+    {% endif %}
+
+    <a href="{% url 'comment_list' %}" class="btn btn-secondary btn-sm">Back</a>
+</div>
+{% endblock %}

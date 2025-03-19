@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+    }
+    .star {
+        font-size: 24px;
+        cursor: pointer;
+        color: lightgray;
+    }
+    .star:hover,
+    .star:hover ~ .star,
+    .star.selected,
+    .star.selected ~ .star {
+        color: gold;
+    }
+</style>
+
+<div class="container mt-5 pt-5">
+    <div class="row">
+
+        <div class="col-lg-6">
+            {% if product.images.all %}
+            <div id="productCarousel-{{ product.slug }}" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for image_obj in product.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ image_obj.image.url }}" class="d-block w-100" alt="{{ product.name }}" style="height: 300px; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if product.images.count > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel-{{ product.slug }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel-{{ product.slug }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                {% endif %}
+            </div>
+            {% else %}
+            <p>No image available</p>
+            {% endif %}
+        </div>
+
+
+        <div class="col-lg-6">
+            <h3>{{ product.name }}</h3>
+            <p class="text-primary fs-4">${{ product.price }}</p>
+            <p class="text-muted">Category: {{ product.category.name }}</p>
+            <p>{{ product.description }}</p>
+
+            <!-- Отзывы -->
+            <h4 class="mt-4"> Comments: </h4>
+            <div class="overflow-auto" style="max-height: 250px;">
+                {% for comment in comments %}
+                <div class="border-bottom pb-2 mb-2">
+                    <strong>{{ comment.author.username }}</strong>:
+                    <p class="mb-1">{{ comment.comment }}</p>
+                    <div class="d-flex mb-2">
+                        {% for i in "12345" %}
+                            {% if i|add:0 <= comment.rating %}
+                                <i class="fa fa-star text-warning"></i>
+                            {% else %}
+                                <i class="fa fa-star text-secondary"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <small class="text-muted">{{ comment.created_at|date:"d M Y" }}</small>
+
+                    {% if request.user == comment.author %}
+                    <div class="mt-2">
+                        <a href="{% url 'comment_update' comment.pk %}" class="btn btn-sm btn-warning">✏ Edit </a>
+                        <a href="{% url 'comment_delete' comment.pk %}" class="btn btn-sm btn-danger">❌ Delete </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p>There are no reviews yet.</p>
+                {% endfor %}
+            </div>
+
+
+            <form method="post" action="{% url 'add_comment' product.id %}" class="mt-4">
+                {% csrf_token %}
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="email" name="email" class="form-control" id="email" placeholder="Your Email" required>
+                            <label for="email">Your Email</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea name="comment" class="form-control" placeholder="Leave a comment here" id="comment" style="height: 150px" required></textarea>
+                            <label for="comment">Your Comment</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="d-flex align-items-center">
+                            <p class="mb-0 me-3">Please rate:</p>
+                            <div class="stars">
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="1">★</span>
+                            </div>
+                            <input name="rating" type="hidden" id="rating" required>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100 py-3">Send Comment</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            const value = this.getAttribute('data-value');
+            ratingInput.value = value;
+
+            stars.forEach(s => {
+                s.classList.remove('selected');
+                if (s.getAttribute('data-value') <= value) {
+                    s.classList.add('selected');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+    }
+    .star {
+        font-size: 24px;
+        cursor: pointer;
+        color: lightgray;
+    }
+    .star:hover,
+    .star:hover ~ .star,
+    .star.selected,
+    .star.selected ~ .star {
+        color: gold;
+    }
+</style>
+
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <h2 class="mb-4">{% if form.instance.pk %}Editing a comment{% else %}Adding a comment{% endif %}</h2>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="email" name="email" class="form-control" id="email" placeholder="Your Email" value="{{ form.email.value|default:'' }}" required>
+                            <label for="email">Your Email</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea name="comment" class="form-control" placeholder="Leave a comment here" id="comment" style="height: 150px" required>{{ form.comment.value|default:'' }}</textarea>
+                            <label for="comment">Your Comment</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="d-flex align-items-center">
+                            <p class="mb-0 me-3">Please rate:</p>
+                            <div class="stars">
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="1">★</span>
+                            </div>
+                            <input name="rating" type="hidden" id="rating" value="{{ form.rating.value|default:'' }}" required>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            {% if form.instance.pk %}Save changes{% else %}Add a comment{% endif %}
+                        </button>
+                        <a href="{% url 'product_detail' form.instance.product.id %}" class="btn btn-secondary w-100 mt-3 py-3">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+
+
+    const initialRating = "{{ form.rating.value|default:'' }}";
+    if (initialRating) {
+        stars.forEach(star => {
+            if (star.getAttribute('data-value') <= initialRating) {
+                star.classList.add('selected');
+            }
+        });
+    }
+
+
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            const value = this.getAttribute('data-value');
+            ratingInput.value = value;
+
+
+            stars.forEach(s => {
+                s.classList.remove('selected');
+                if (s.getAttribute('data-value') <= value) {
+                    s.classList.add('selected');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

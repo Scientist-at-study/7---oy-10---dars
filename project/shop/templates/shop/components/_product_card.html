@@ -1,0 +1,70 @@
+<div class="col-lg-6">
+    <div class="d-flex align-items-center">
+
+
+        {% if product.images.all %}
+        <div id="productCarousel-{{ product.slug }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image_obj in product.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image_obj.image.url }}" class="d-block w-100" alt="{{ product.name }}" style="height: 300px; object-fit: cover;">
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if product.images.count > 1 %}
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel-{{ product.slug }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel-{{ product.slug }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+
+            <div class="carousel-indicators">
+                {% for image in product.images.all %}
+                <button type="button" data-bs-target="#productCarousel-{{ product.slug }}" data-bs-slide-to="{{ forloop.counter0 }}"
+                        {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No image available</p>
+        {% endif %}
+
+
+        <div class="w-100 d-flex flex-column text-start ps-4">
+
+
+            <h5 class="d-flex justify-content-between border-bottom pb-2">
+                <span>{{ product.name }}</span>
+                <span>
+                    {% if product.discount > 0 %}
+                        <span class="text-danger" style="text-decoration: line-through;">${{ product.price }}</span>
+                        <span class="text-success fw-bold ms-2">${{ product.get_discounted_price }}</span>
+                    {% else %}
+                        <span class="text-primary">${{ product.price }}</span>
+                    {% endif %}
+                </span>
+            </h5>
+
+
+            <div class="d-flex mb-2">
+                {% for i in "12345" %}
+                    {% if i|add:0 <= product.rating %}
+                        <i class="fa fa-star" style="color: gold;"></i>
+                    {% else %}
+                        <i class="fa fa-star" style="color: lightgray;"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+
+            <small class="text-muted">{{ product.category.parent.name }}</small>
+            <small class="fst-italic">{{ product.description|truncatewords:10 }}</small>
+        </div>
+    </div>
+</div>

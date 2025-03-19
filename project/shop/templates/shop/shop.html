@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+{% block hero %}
+<div class="container-xxl py-5 bg-dark hero-header mb-5">
+    <div class="container text-center my-5 pt-5 pb-4">
+        <h1 class="display-3 text-white mb-3 animated slideInDown">Shop</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center text-uppercase">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">Shop</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock hero %}
+
+{% block content %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h5 class="section-title ff-secondary text-center text-primary fw-normal">Food Menu</h5>
+            <h1 class="mb-5">Most Popular Items</h1>
+        </div>
+
+        <!-- Search and Sorting Section -->
+        <div class="row g-4">
+            <div class="col-xl-3">
+                <div class="input-group w-100 mx-auto d-flex">
+                    <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                    <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                </div>
+            </div>
+            <div class="col-6"></div>
+            <div class="col-xl-3">
+                <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
+                    <label for="fruits">Default Sorting:</label>
+                    <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform">
+                        <option value="volvo">Nothing</option>
+                        <option value="saab">Popularity</option>
+                        <option value="opel">Organic</option>
+                        <option value="audi">Fantastic</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Categories and Filters Section -->
+            <div class="col-lg-3">
+                <div class="row g-4">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <h4>Categories</h4>
+                            <ul class="list-unstyled fruite-categorie">
+                                {% for subcategory in subcategories %}
+                                <li>
+                                    <div class="d-flex justify-content-between fruite-name">
+                                        <a href="#">
+                                            <i class="fas fa-apple-alt me-2"></i>{{ subcategory.name }}
+                                        </a>
+                                        <span>({{ subcategory.products.count }})</span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <form method="post">
+                            {% csrf_token %}
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <h4 class="mb-2">Price</h4>
+                            <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="{{ min_price }}" max="{{ max_price }}" value="{{ min_price }}" oninput="amount.value=rangeInput.value">
+                            <output id="amount" name="amount" min-velue="{{ min_price }}" max-value="{{ max_price }}" for="rangeInput">{{ min_price }}</output>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <h4>Additional</h4>
+                            {% for additional in additions %}
+                            <div class="mb-2">
+                                <input type="radio" class="me-2" id="Categories-{{ additional.pk }}" name="Categories-1" value="{{ additional.pk }}">
+                                <label for="Categories-{{ additional.pk }}"> {{ additional.name }} </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                        <button type="submit" class="btn btn-primary">Ok</button>
+                        </form>
+
+
+
+                    <div class="col-lg-12">
+                        <h4 class="mb-3">Featured products</h4>
+                        {% for product in featured_products %}
+                        <div class="d-flex align-items-center justify-content-start mb-3">
+                            <div class="rounded me-4" style="width: 100px; height: 100px;">
+                                <img src="{{ product.images.first.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                            </div>
+                            <div>
+                                <h6 class="mb-2">{{ product.name }}</h6>
+                                <div class="d-flex mb-2">
+                                    <i class="fa fa-star text-secondary"></i>
+                                    <i class="fa fa-star text-secondary"></i>
+                                    <i class="fa fa-star text-secondary"></i>
+                                    <i class="fa fa-star text-secondary"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="d-flex mb-2">
+                                    <h5 class="fw-bold me-2">${{ product.get_discounted_price }}</h5>
+                                    {% if product.discount > 0 %}
+                                    <h5 class="text-danger text-decoration-line-through">${{ product.price }}</h5>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="d-flex justify-content-center my-4">
+                            <a href="#" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">View More</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="position-relative">
+                            <img src="{% static 'img/banner-fruits.jpg' %}" class="img-fluid w-100 rounded" alt="">
+                            <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
+                                <h3 class="text-secondary fw-bold">Fresh <br> Fruits <br> Banner</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="col-lg-9">
+                <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
+                    <ul class="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
+                        <li class="nav-item">
+                            <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3 active" data-bs-toggle="pill" href="#tab-1">
+                                <div class="ps-3">
+                                    <h6 class="mt-n1 mb-0">All products</h6>
+                                </div>
+                            </a>
+                        </li>
+                        {% for category in categories %}
+                        <li class="nav-item">
+                            <a class="d-flex align-items-center text-start mx-3 pb-3" data-bs-toggle="pill" href="#tab-{{ category.slug }}">
+                                <div class="ps-3">
+                                    <h6 class="mt-n1 mb-0">{{ category.name }}</h6>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="tab-content">
+                        <div id="tab-1" class="tab-pane fade show p-0 active">
+                            <div class="row g-4">
+                                {% for product in products %}
+                                <a href="{% url 'product_detail' product.id %}">
+                                    {% include 'shop/components/_product_card.html' %}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% for category in categories %}
+                        <div id="tab-{{ category.slug }}" class="tab-pane fade show p-0">
+                            <div class="row g-4">
+                                {% for product in products %}
+                                {% if product.category.parent == category %}
+                                <a href="{% url 'product_detail' product.id %}">
+                                    {% include 'shop/components/_product_card.html' %}
+                                </a>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Pagination (не активна) -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+<!--{% url 'shop_by_category' category.slug %}-->
